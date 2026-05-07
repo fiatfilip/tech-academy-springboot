@@ -1,15 +1,13 @@
 package ro.digitalstack.betfair.tech_academy_springboot.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
+@Table(name = "products")
 public class Product extends RepresentationModel<Product> {
 
     @Id

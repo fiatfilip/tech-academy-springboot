@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Service
 public class ProductService {
-    @Autowired
+    // @Autowired
     private final ProductRepository productRepository;
 
 

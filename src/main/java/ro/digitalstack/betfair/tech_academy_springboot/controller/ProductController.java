@@ -28,7 +28,6 @@ public class ProductController {
         Product createdProduct =  productService.create(product);
         System.out.println(createdProduct);
         return EntityModel.of(createdProduct,//
-                linkTo(methodOn(ProductController.class).get(createdProduct.getId())).withSelfRel(),
                 linkTo(methodOn(ProductController.class).get(createdProduct.getId())).withSelfRel());
     }
 

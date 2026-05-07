@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
+@Table(name = "order_items")
 public class OrderItem {
 
     @Id
@@ -22,9 +23,7 @@ public class OrderItem {
 
     private OrderItem() {
     }
-    public OrderItem(Product product, int quantity) {
-        this.product = product;
-        this.price = product.getPrice();
+    public OrderItem(int quantity) {
         this.quantity = quantity;
     }
 
@@ -42,6 +41,7 @@ public class OrderItem {
 
     public void setProduct(Product product) {
         this.product = product;
+        this.price = product.getPrice();
     }
 
     public double getPrice() {
