@@ -1,11 +1,14 @@
 package ro.digitalstack.betfair.tech_academy_springboot.controller;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
 import ro.digitalstack.betfair.tech_academy_springboot.entity.Order;
 import ro.digitalstack.betfair.tech_academy_springboot.entity.OrderItem;
 import ro.digitalstack.betfair.tech_academy_springboot.entity.Product;
+import ro.digitalstack.betfair.tech_academy_springboot.payment.PaymentConfig;
+import ro.digitalstack.betfair.tech_academy_springboot.payment.PaymentProcessor;
 import ro.digitalstack.betfair.tech_academy_springboot.service.OrderService;
 import ro.digitalstack.betfair.tech_academy_springboot.service.ProductService;
 
@@ -20,11 +23,17 @@ public class OrderController {
 
     private final OrderService orderService;
     private final ProductService productService;
+    private final PaymentProcessor paymentProcessorIngenico;
+    private final PaymentProcessor paymentProcessorPayPal;
 
     public OrderController(OrderService orderService,
-                           ProductService productService) {
+                           ProductService productService,
+                           @Qualifier("payPalProcessor") PaymentProcessor paymentProcessorPayPal,
+                           @Qualifier("ingenicoProcessor") PaymentProcessor paymentProcessorIngenico) {
         this.orderService = orderService;
         this.productService = productService;
+        this.paymentProcessorIngenico = paymentProcessorIngenico;
+        this.paymentProcessorPayPal = paymentProcessorPayPal;
     }
     @PostMapping("/orders")
     public EntityModel<Order> createOrder(@RequestBody Order order) {
@@ -70,5 +79,19 @@ public class OrderController {
                 linkTo(methodOn(OrderController.class).get(order.getId())).withSelfRel(),
                 linkTo(methodOn(OrderController.class).getAll()).withRel("orders"));
     }
+
+    @PostMapping("/orders/{id}/pay")
+    public EntityModel<Order> pay(@PathVariable UUID id, @RequestBody PaymentConfig paymentConfig) {
+        Order order = orderService.findById(id);
+        if("ingenico".equalsIgnoreCase(paymentConfig.paymentType)) {
+            paymentProcessorIngenico.pay(order);
+        } else {
+            paymentProcessorPayPal.pay(order);
+        }
+        return EntityModel.of(order,
+                linkTo(methodOn(OrderController.class).get(order.getId())).withSelfRel(),
+                linkTo(methodOn(OrderController.class).getAll()).withRel("orders"));
+    }
+
 
 }
